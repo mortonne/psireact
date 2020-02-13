@@ -72,3 +72,8 @@ def tcdf(t, A, b, v, s):
     e4 = ((t * s) / A) * normpdf((b - t * v) / (t * s))
     F = 1 + e1 - e2 + e3 - e4
     return F
+
+
+def resp_pdf(t, i, A, b, v, s):
+    """Probability density function for response i at time t."""
+    pass
