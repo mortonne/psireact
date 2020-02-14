@@ -6,6 +6,7 @@ import scipy.stats as st
 import theano
 import theano.tensor as tt
 import pymc3 as pm
+from . import model
 
 
 def sample_finish_time(A, b, v, s, tau, size):
@@ -94,3 +95,28 @@ def resp_pdf(t, i, A, b, v, s):
     pdf = (tpdf(t, A, b, v[i], s) * ncdf_all) / (1 - all_neg)
     pdf_cond = tt.switch(tt.gt(t, 0), pdf, 0)
     return pdf_cond
+
+
+class LBA(model.ReactModel):
+    """Linear Ballistic Accumulator model."""
+
+    def tensor_pdf(self, rt, response, test, param):
+        tau = param['tau']
+        sub_param = param.copy()
+        del sub_param['tau']
+        return resp_pdf(rt - tau, response, **sub_param)
+
+    def function_pdf(self):
+        t = tt.dvector('t')
+        i = tt.iscalar('i')
+        A = tt.dscalar('A')
+        b = tt.dscalar('b')
+        v = tt.dvector('v')
+        s = tt.dscalar('s')
+        pdf = resp_pdf(t, i, A, b, v, s)
+        f = theano.function([t, i, A, b, v, s], pdf)
+        return f
+
+    def rvs_test(self, test, param, size):
+        rt, resp = sample_response(**param, size=size)
+        return rt, resp
