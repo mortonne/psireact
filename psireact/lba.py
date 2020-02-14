@@ -3,6 +3,8 @@
 import math
 import numpy as np
 import scipy.stats as st
+import theano
+import theano.tensor as tt
 import pymc3 as pm
 
 
@@ -76,4 +78,19 @@ def tcdf(t, A, b, v, s):
 
 def resp_pdf(t, i, A, b, v, s):
     """Probability density function for response i at time t."""
-    pass
+    all_neg, updates = theano.reduce(
+        fn=lambda v_i, tot, s: normcdf(-v_i / s) * tot,
+        outputs_info=tt.ones(1, dtype='float64'), sequences=v, non_sequences=s)
+
+    # 1 - cdf for all other accumulators
+    v_ind = tt.arange(v.shape[0])
+    v_other = v[tt.nonzero(tt.neq(v_ind, i))]
+    ncdf_all, updates = theano.reduce(
+        fn=lambda v_i, tot, t, A, b, s: 1 - tcdf(t, A, b, v_i, s) * tot,
+        outputs_info=tt.ones_like(t), sequences=v_other,
+        non_sequences=[t, A, b, s])
+
+    # pdf for this and no finish yet for others
+    pdf = (tpdf(t, A, b, v[i], s) * ncdf_all) / (1 - all_neg)
+    pdf_cond = tt.switch(tt.gt(t, 0), pdf, 0)
+    return pdf_cond
