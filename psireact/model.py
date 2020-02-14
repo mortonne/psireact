@@ -129,7 +129,7 @@ def post_param(trace, fixed, group_vars, subj_vars):
     return param, subj_param
 
 
-class Model:
+class ReactModel:
     """Base class for RT models."""
 
     def __init__(self):
