@@ -7,7 +7,7 @@ This package currently implements the linear ballistic accumulator (LBA) model (
   <img src="https://github.com/mortonne/psireact/blob/master/jupyter/lba_24afc.png" alt="probability density function" width="400">
 </p>
 
-In this example, there are 24 possible responses. Each curve shows the probability density function for one response. The overall height of each curve reflects the probability of that response, and the shape reflects the probability of different response times.
+In this example, there are 24 possible responses. Each curve shows the probability density function for one response according to the LBA model. The overall height of each curve reflects the probability of that response, and the shape reflects the probability of different response times.
 
 ## Installation
 
