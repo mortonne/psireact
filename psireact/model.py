@@ -114,18 +114,22 @@ def sample_params(fixed, param, subj_param, n_subj):
     return gen_param, gen_param_subj
 
 
-def post_param(trace, fixed, group_vars, subj_vars):
+def post_param(trace, fixed, group_vars, subj_vars=None):
     """Create parameter set from mean of the posterior distribution."""
 
     param = fixed.copy()
     for name in group_vars:
-        param[name] = np.mean(trace.get_values(name))
+        param[name] = np.mean(trace.get_values(name), 0)
 
-    m_subj = {name: np.mean(trace.get_values(name), 0) for name in subj_vars}
-    n_subj = len(m_subj[subj_vars[0]])
-    subj_param = [dict(zip(subj_vars,
-                           [m_subj[name][ind] for name in subj_vars]))
-                  for ind in range(n_subj)]
+    if subj_vars is not None:
+        m_subj = {name: np.mean(trace.get_values(name), 0)
+                  for name in subj_vars}
+        n_subj = len(m_subj[subj_vars[0]])
+        subj_param = [dict(zip(subj_vars,
+                               [m_subj[name][ind] for name in subj_vars]))
+                      for ind in range(n_subj)]
+    else:
+        subj_param = {}
     return param, subj_param
 
 
