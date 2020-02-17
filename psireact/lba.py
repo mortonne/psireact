@@ -86,7 +86,7 @@ def ncdf(t, A, b, v, s):
     return ncdf_all
 
 
-def resp_pdf(t, i, A, b, v, s):
+def resp_pdf(t, ind, A, b, v, s):
     """Probability density function for response i at time t."""
     p_neg, updates = theano.reduce(
         fn=lambda v_i, tot, s: normcdf(-v_i / s) * tot,
@@ -94,6 +94,7 @@ def resp_pdf(t, i, A, b, v, s):
 
     # PDF for i and no finish yet for others
     v_ind = tt.arange(v.shape[0])
+    i = tt.cast(ind, 'int64')
     res, updates = theano.scan(
         fn=(lambda t_j, i_j, v_ind, A, b, v, s:
             (tpdf(t_j, A, b, v[i_j], s) *
