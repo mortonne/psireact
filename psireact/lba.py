@@ -118,8 +118,11 @@ class LBA(model.ReactModel):
         return resp_pdf(rt - tau, response, **sub_param)
 
     def function_pdf(self):
+        # time and response vary by trial
         t = tt.dvector('t')
-        i = tt.iscalar('i')
+        i = tt.ivector('i')
+
+        # parameters are fixed over trial
         A = tt.dscalar('A')
         b = tt.dscalar('b')
         v = tt.dvector('v')
