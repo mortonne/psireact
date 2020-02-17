@@ -1,4 +1,4 @@
-# psireact
+# PsiReact
 Hierarchical Bayesian modeling of response time data.
 
 ## Installation
