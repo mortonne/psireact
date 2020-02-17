@@ -9,6 +9,12 @@ This package currently implements the linear ballistic accumulator (LBA) model (
 
 In this example, there are 24 possible responses. Each curve shows the probability density function for one response according to the LBA model. The overall height of each curve reflects the probability of that response, and the shape reflects the probability of different response times.
 
+PsiReact can be used to:
+ * Fit data to estimate model parameters
+ * Use hierarchical models to estimate both group-level tendencies and individual differences
+ * Generate simulated response time data for analysis
+ * Compare different models of response behavior
+
 ## Installation
 
 First, it is strongly recommended that you set up either a [Conda environment](https://conda.io/en/latest/) or a [Python virtual environment](https://docs.python.org/3/library/venv.html). This helps keep packages installed for different projects separate. For example, using Conda:
