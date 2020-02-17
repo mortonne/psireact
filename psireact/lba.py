@@ -80,7 +80,7 @@ def tcdf(t, A, b, v, s):
 def ncdf(t, A, b, v, s):
     """Probability of no response from a set of accumulators."""
     ncdf_all, updates = theano.reduce(
-        fn=lambda v_i, tot, t, A, b, s: 1 - tcdf(t, A, b, v_i, s) * tot,
+        fn=lambda v_i, tot, t, A, b, s: (1 - tcdf(t, A, b, v_i, s)) * tot,
         sequences=v, outputs_info=tt.ones_like(t),
         non_sequences=[t, A, b, s])
     return ncdf_all
