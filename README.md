@@ -33,3 +33,9 @@ Directions for future development:
  * support for additional response time models
  * testing and demo of maximum likelihood estimation
  * update to use PyMC4 when available; this will switch the back end from Theano to TensorFlow
+
+## Citation
+
+If you use PsiReact for research, please cite the following paper:
+
+Morton NW, Schlichting ML, Preston AR. In revision. Representations of common event structure in medial temporal lobe and frontoparietal cortex support efficient inference.
