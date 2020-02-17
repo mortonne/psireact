@@ -36,6 +36,6 @@ Directions for future development:
 
 ## Citation
 
-If you use PsiReact for research, please cite the following paper:
+If you use PsiReact, please cite the following paper:
 
 Morton NW, Schlichting ML, Preston AR. In revision. Representations of common event structure in medial temporal lobe and frontoparietal cortex support efficient inference.
