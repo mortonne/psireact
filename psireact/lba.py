@@ -109,6 +109,23 @@ def resp_pdf(t, ind, A, b, v, s):
     return pdf_cond
 
 
+def trial_resp_pdf(t, ind, A, b, v, s):
+    """Probability density function for response i at time t."""
+    p_neg, updates = theano.reduce(
+        fn=lambda v_i, tot, s: normcdf(-v_i / s) * tot,
+        sequences=v, outputs_info=tt.ones(1, dtype='float64'), non_sequences=s)
+
+    # PDF for i and no finish yet for others
+    v_ind = tt.arange(v.shape[0])
+    i = tt.cast(ind, 'int64')
+    pdf = (tpdf(t, A, b, v[i], s) *
+           ncdf(t, A, b, v[tt.nonzero(tt.neq(v_ind, i))], s)) / (1 - p_neg)
+
+    # define probability of negative times to zero
+    pdf_cond = tt.switch(tt.gt(t, 0), pdf, 0)
+    return pdf_cond
+
+
 class LBA(model.ReactModel):
     """Linear Ballistic Accumulator model."""
 
