@@ -327,9 +327,4 @@ class ReactModel:
 
         return param, stats
 
-    def post_param(self, trace):
-        """Get posterior estimates of parameters."""
 
-        param, subj_param = post_param(trace, self.fixed, self.group_vars,
-                                       self.subj_vars)
-        return param, subj_param
