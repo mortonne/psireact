@@ -32,4 +32,4 @@ Directions for future development:
  * notebook illustrating definition and use of a hierarchical model
  * support for additional response time models
  * testing and demo of maximum likelihood estimation
- * update to use pyMC4 when available; this will switch the back end from Theano to TensorFlow
+ * update to use PyMC4 when available; this will switch the back end from Theano to TensorFlow
