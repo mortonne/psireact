@@ -5,6 +5,8 @@ This package currently implements the linear ballistic accumulator (LBA) model (
 
 ![probability density function](jupyter/lba_24afc.png)
 
+In this example, there are 24 possible responses. Each response is controlled by a drift rate *v*. The drift rate of each response option affects the probability of each response. When drift rates are multiplied by a factor (*vmax*), the response option with the highest drift rate becomes relatively more likely.
+
 ## Installation
 
 First, it is strongly recommended that you set up either a [Conda environment](https://conda.io/en/latest/) or a [Python virtual environment](https://docs.python.org/3/library/venv.html). This helps keep packages installed for different projects separate. For example, using Conda:
