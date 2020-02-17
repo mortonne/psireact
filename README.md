@@ -14,3 +14,9 @@ git clone git@github.com:mortonne/psireact.git
 cd psireact
 python setup.py install
 ```
+
+## Getting started
+
+The package is designed to support multiple decision models, but currently only includes the linear ballistic accumulator (LBA) model (Brown & Heathcote 2008).
+
+To get an intuition for what sort of behavior the LBA model can produce, look at the [LBA demo notebook](https://github.com/mortonne/psireact/blob/master/jupyter/lba_demo.ipynb). The LBA model can be used to both generate simulated data and to estimate parameters based on observed data. See the [LBA parameter recovery](https://github.com/mortonne/psireact/blob/master/jupyter/lba_recovery.ipynb) notebook for examples.
