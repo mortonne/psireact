@@ -127,8 +127,9 @@ class LBA(model.ReactModel):
         b = tt.dscalar('b')
         v = tt.dvector('v')
         s = tt.dscalar('s')
-        pdf = resp_pdf(t, i, A, b, v, s)
-        f = theano.function([t, i, A, b, v, s], pdf)
+        tau = tt.dscalar('tau')
+        pdf = resp_pdf(t - tau, i, A, b, v, s)
+        f = theano.function([t, i, A, b, v, s, tau], pdf)
         return f
 
     def rvs_test(self, test, param, size):
