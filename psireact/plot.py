@@ -5,24 +5,28 @@ import pandas as pd
 import seaborn as sns
 
 
-def plot_fit(data, sim):
+def plot_fit(data, sim, bins=None, test_labels=None, response_labels=None):
     """Plot fit as a function of test type and response."""
 
     data.loc[:, 'source'] = 'Data'
     sim.loc[:, 'source'] = 'Model'
     full = pd.concat((data, sim), join='inner', ignore_index=True)
-    full.loc[:, 'order'] = full.loc[:, 'response']
-    full.loc[full.order == 0, 'order'] = 2
-    g = sns.FacetGrid(full, col='test', hue='source', row='order', sharey=True)
-    g.map(sns.distplot, 'rt', norm_hist=True, kde=False,
-          bins=np.linspace(0, 15, 16))
+    g = sns.FacetGrid(full, col='response', hue='source',
+                      row='test', sharex=True)
+    g.map(sns.distplot, 'rt', norm_hist=True, kde=False, bins=bins)
     g.axes[0, 0].legend()
     g.set_titles('')
     g.set_xlabels('Reaction time')
-    g.axes[0, 0].set_ylabel('Correct (relative frequency)')
-    g.axes[1, 0].set_ylabel('Incorrect (relative frequency)')
-    g.axes[0, 0].set_title('Direct')
-    g.axes[0, 1].set_title('Inference')
+
+    if test_labels is None:
+        test_labels = ['Relative frequency']
+    for i in range(g.axes.shape[0]):
+        g.axes[i, 0].set_ylabel(test_labels[i])
+
+    if response_labels is None:
+        response_labels = [f'Response {i + 1}' for i in range(g.axes.shape[1])]
+    for i in range(g.axes.shape[1]):
+        g.axes[0, i].set_title(response_labels[i])
     return g
 
 
