@@ -3,7 +3,7 @@ Hierarchical Bayesian modeling of response time data.
 
 This package currently implements the linear ballistic accumulator (LBA) model (Brown & Heathcote 2008), with potential for other decision models to be added later. LBA has a closed-form solution, making it mathmatically tractable, while capturing many important properties of response time distributions. Importantly, while many response time models only support simulation of tasks with only two response options, LBA can simulate tasks with many response options.
 
-![probability density function](jupyter/lba_24afc.png)
+<img src="/mortonne/psireact/raw/master/jupyter/lba_24afc.png" alt="probability density function" width="50px">
 
 In this example, there are 24 possible responses. Each response is controlled by a drift rate *v*. The drift rate of each response option affects the probability of each response. When drift rates are multiplied by a factor (*vmax*), the response option with the highest drift rate becomes relatively more likely.
 
