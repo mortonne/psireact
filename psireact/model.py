@@ -187,7 +187,8 @@ class ReactModel:
                 rt, response = self.rvs_subj(test, subj_idx, param, subj_param)
             else:
                 rt, response = self.rvs(test, param)
-            rep = pd.DataFrame({'test': test, 'rt': rt, 'response': response})
+            rep = pd.DataFrame({'test': test, 'rt': rt,
+                                'response': response.astype('int32')})
             if subj_idx is not None:
                 rep.loc[:, 'subj_idx'] = subj_idx
             rep.loc[:, 'rep'] = i
