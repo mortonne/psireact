@@ -88,20 +88,22 @@ def ncdf(t, A, b, v, s):
 
 def resp_pdf(t, i, A, b, v, s):
     """Probability density function for response i at time t."""
-    all_neg, updates = theano.reduce(
+    p_neg, updates = theano.reduce(
         fn=lambda v_i, tot, s: normcdf(-v_i / s) * tot,
-        outputs_info=tt.ones(1, dtype='float64'), sequences=v, non_sequences=s)
+        sequences=v, outputs_info=tt.ones(1, dtype='float64'), non_sequences=s)
 
-    # 1 - cdf for all other accumulators
+    # PDF for i and no finish yet for others
     v_ind = tt.arange(v.shape[0])
-    v_other = v[tt.nonzero(tt.neq(v_ind, i))]
-    ncdf_all, updates = theano.reduce(
-        fn=lambda v_i, tot, t, A, b, s: 1 - tcdf(t, A, b, v_i, s) * tot,
-        outputs_info=tt.ones_like(t), sequences=v_other,
-        non_sequences=[t, A, b, s])
+    res, updates = theano.scan(
+        fn=(lambda t_j, i_j, v_ind, A, b, v, s:
+            (tpdf(t_j, A, b, v[i_j], s) *
+             ncdf(t_j, A, b, v[tt.nonzero(tt.neq(v_ind, i_j))], s))),
+        sequences=[t, i], non_sequences=[v_ind, A, b, v, s])
 
-    # pdf for this and no finish yet for others
-    pdf = (tpdf(t, A, b, v[i], s) * ncdf_all) / (1 - all_neg)
+    # conditionalize on any response
+    pdf = res / (1 - p_neg)
+
+    # define probability of negative times to zero
     pdf_cond = tt.switch(tt.gt(t, 0), pdf, 0)
     return pdf_cond
 
