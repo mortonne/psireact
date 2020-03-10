@@ -52,6 +52,7 @@ def plot_fit_subj(data, sim, test=None):
 def plot_fit_scatter(data, sim):
     """Plot mean RT fit by subject."""
 
+    # TODO: generalize for an arbitrary set of test types
     d1 = data.groupby(['subj_idx', 'test']).mean()
     d1.loc[:, 'data'] = d1.loc[:, 'rt']
     d2 = sim.groupby(['subj_idx', 'test']).mean()
