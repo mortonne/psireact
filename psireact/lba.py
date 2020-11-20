@@ -6,7 +6,7 @@ import scipy.stats as st
 import theano
 import theano.tensor as tt
 import pymc3 as pm
-from . import model
+from psireact import model
 
 
 def sample_finish_time(A, b, v, s, tau, size):
