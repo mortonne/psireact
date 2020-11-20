@@ -50,4 +50,4 @@ Directions for future development:
 
 If you use PsiReact, please cite the following paper:
 
-Morton NW, Schlichting ML, Preston AR. In revision. Representations of common event structure in medial temporal lobe and frontoparietal cortex support efficient inference.
+Morton NW, Schlichting ML, Preston AR. In press. Representations of common event structure in medial temporal lobe and frontoparietal cortex support efficient inference.
