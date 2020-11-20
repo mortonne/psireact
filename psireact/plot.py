@@ -7,7 +7,6 @@ import seaborn as sns
 
 def plot_fit(data, sim, bins=None, test_labels=None, response_labels=None):
     """Plot fit as a function of test type and response."""
-
     data.loc[:, 'source'] = 'Data'
     sim.loc[:, 'source'] = 'Model'
     full = pd.concat((data, sim), join='inner', ignore_index=True)
@@ -32,7 +31,6 @@ def plot_fit(data, sim, bins=None, test_labels=None, response_labels=None):
 
 def plot_fit_subj(data, sim, test=None):
     """Plot fit by subject."""
-
     data.loc[:, 'source'] = 'Data'
     sim.loc[:, 'source'] = 'Model'
     full = pd.concat((data, sim), join='inner', ignore_index=True)
@@ -51,7 +49,6 @@ def plot_fit_subj(data, sim, test=None):
 
 def plot_fit_scatter(data, sim):
     """Plot mean RT fit by subject."""
-
     # TODO: generalize for an arbitrary set of test types
     d1 = data.groupby(['subj_idx', 'test']).mean()
     d1.loc[:, 'data'] = d1.loc[:, 'rt']

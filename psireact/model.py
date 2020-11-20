@@ -18,7 +18,6 @@ def log_prob(p):
 
 def param_search(f_fit, data, bounds, nrep=1, verbose=False):
     """Run a parameter search, with optional replication."""
-
     f_optim = optim.differential_evolution
     if nrep > 1:
         val = np.zeros(nrep)
@@ -40,7 +39,6 @@ def param_search(f_fit, data, bounds, nrep=1, verbose=False):
 
 def param_bounds(var_bounds, var_names):
     """Pack group-level parameters."""
-
     group_lb = [var_bounds[k][0] for k in [*var_names]]
     group_ub = [var_bounds[k][1] for k in [*var_names]]
     bounds = optim.Bounds(group_lb, group_ub)
@@ -49,7 +47,6 @@ def param_bounds(var_bounds, var_names):
 
 def subj_bounds(var_bounds, group_vars, subj_vars, n_subj):
     """Pack subject-varying parameters."""
-
     group_lb = [var_bounds[k][0] for k in [*group_vars]]
     group_ub = [var_bounds[k][1] for k in [*group_vars]]
 
@@ -64,7 +61,6 @@ def subj_bounds(var_bounds, group_vars, subj_vars, n_subj):
 
 def unpack_subj(fixed, x, group_vars, subj_vars):
     """Unpack subject-varying parameters."""
-
     # unpack group parameters
     param = fixed.copy()
     param.update(dict(zip(group_vars, x)))
@@ -85,7 +81,6 @@ def unpack_subj(fixed, x, group_vars, subj_vars):
 
 def trace_df(trace):
     """Create a data frame from a trace object."""
-
     # exclude transformed variables
     var_names = [n for n in trace.varnames if not n.endswith('__')]
     d_var = {var: trace.get_values(var) for var in var_names}
@@ -95,7 +90,6 @@ def trace_df(trace):
 
 def sample_hier_drift(sd, alpha, beta, size=1):
     """Sample a hierarchical drift parameter."""
-
     group_mu = st.halfnorm.rvs(sd)
     group_sd = st.gamma.rvs(alpha, 1/beta)
     x = st.norm.rvs(group_mu, group_sd, size)
@@ -104,7 +98,6 @@ def sample_hier_drift(sd, alpha, beta, size=1):
 
 def sample_params(fixed, param, subj_param, n_subj):
     """Create a random sample of parameters."""
-
     d_group = {name: f() for name, f in param.items()}
     d_subj = {name: f() for name, f in subj_param.items()}
     gen_param_subj = [{name: val[i] for name, val in d_subj.items()}
@@ -116,7 +109,6 @@ def sample_params(fixed, param, subj_param, n_subj):
 
 def post_param(trace, fixed, group_vars, subj_vars=None):
     """Create parameter set from mean of the posterior distribution."""
-
     param = fixed.copy()
     for name in group_vars:
         param[name] = np.mean(trace.get_values(name), 0)
@@ -135,7 +127,6 @@ def post_param(trace, fixed, group_vars, subj_vars=None):
 
 class ReactModel:
     """Base class for RT models."""
-
     def __init__(self):
         self.fixed = None
         self.group_vars = None
@@ -172,7 +163,6 @@ class ReactModel:
 
     def rvs_subj(self, test, subj_idx, param, subj_param):
         """Generate responses based on subject-varying parameters."""
-
         unique_idx = np.unique(subj_idx)
         rt = np.zeros(test.shape)
         response = np.zeros(test.shape)
@@ -184,7 +174,6 @@ class ReactModel:
 
     def gen(self, test, param, subj_idx=None, nrep=1, subj_param=None):
         """Generate a simulated dataset."""
-
         data_list = []
         for i in range(nrep):
             if subj_param is not None:
@@ -220,7 +209,6 @@ class ReactModel:
 
     def total_logl(self, rt, response, test, param, f_l=None):
         """Calculate log likelihood."""
-
         if f_l is None:
             f_l = self.function_pdf()
         eps = 0.000001
@@ -235,7 +223,6 @@ class ReactModel:
     def total_logl_subj(self, rt, response, test, subj_idx, param, indiv_param,
                         f_l=None):
         """Calculate log likelihood using subject-varying parameters."""
-
         if f_l is None:
             f_l = self.function_pdf()
 
@@ -253,7 +240,6 @@ class ReactModel:
 
     def function_logl(self, fixed, var_names):
         """Generate log likelihood function for use with fitting."""
-
         param = fixed.copy()
         f_l = self.function_pdf()
 
@@ -267,7 +253,6 @@ class ReactModel:
 
     def function_logl_subj(self, fixed, group_vars, subj_vars):
         """Generate log likelihood function for subject fitting."""
-
         f_l = self.function_pdf()
 
         def fit_logl_subj(x, rt, response, test, subj_idx):
@@ -284,7 +269,6 @@ class ReactModel:
     def fit(self, rt, response, test, fixed, var_names, var_bounds,
             nrep=1, verbose=False):
         """Estimate maximum likelihood parameters."""
-
         # maximum likelihood estimation
         fit_logl = self.function_logl(fixed, var_names)
         bounds = param_bounds(var_bounds, var_names)
@@ -308,7 +292,6 @@ class ReactModel:
                  fixed, group_vars, subj_vars, var_bounds,
                  nrep=1, verbose=False):
         """Estimate maximum likelihood parameters for each subject."""
-
         # maximum likelihood estimation
         fit_logl = self.function_logl_subj(fixed, group_vars, subj_vars)
 
@@ -330,5 +313,3 @@ class ReactModel:
         stats = {'logl': logl, 'k': k, 'n': n, 'bic': bic}
 
         return param, stats
-
-

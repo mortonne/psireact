@@ -28,7 +28,6 @@ def sample_finish_time(A, b, v, s, tau, size):
 
 def sample_response(A, b, v, s, tau, size):
     """Sample response from a set of accumulators."""
-
     # get finish time for each accumulator
     t = sample_finish_time(A, b, v, s, tau, size)
 
@@ -128,7 +127,6 @@ def trial_resp_pdf(t, ind, A, b, v, s):
 
 class LBA(model.ReactModel):
     """Linear Ballistic Accumulator model."""
-
     def tensor_pdf(self, rt, response, test, param):
         tau = param['tau']
         sub_param = param.copy()
