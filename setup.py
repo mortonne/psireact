@@ -18,6 +18,7 @@ setuptools.setup(
         'scipy',
         'pandas',
         'seaborn',
+        'pymc3',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
