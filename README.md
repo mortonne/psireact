@@ -1,4 +1,7 @@
 # PsiReact
+[![PyPI version](https://badge.fury.io/py/psireact.svg)](https://badge.fury.io/py/psireact)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4282758.svg)](https://doi.org/10.5281/zenodo.4282758)
+
 Hierarchical Bayesian modeling of response time data.
 
 This package currently implements the linear ballistic accumulator (LBA) model (Brown & Heathcote 2008), with potential for other decision models to be added later. LBA has a closed-form solution, making it mathmatically tractable, while capturing many important properties of response time distributions. Importantly, while many response time models only support simulation of tasks with only two response options, LBA can simulate tasks with many response options.
