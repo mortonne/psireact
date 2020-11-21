@@ -29,11 +29,7 @@ conda create -n psireact python=3.8
 conda activate psireact
 ```
 
-Once you've activated the environment you'll be using, install [Theano](http://deeplearning.net/software/theano/install.html). 
-Theano compiles code on the fly, so installation is relatively system dependent. 
-Follow the instructions on the Theano page. Next, install [PyMC3](https://docs.pymc.io/).
-
-Finally, you can install the latest stable version of PsiReact using pip:
+You can install the latest stable version of PsiReact using pip:
 
 ```bash
 pip install psireact
