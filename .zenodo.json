@@ -1,0 +1,19 @@
+{
+    "language": "eng",
+    "license": "GPL-3.0+",
+    "title": "PsiReact: Analysis of response time data.",
+    "upload_type": "software",
+    "creators": [
+        {
+            "orcid": "0000-0002-2631-2710",
+            "affiliation": "The University of Texas at Austin",
+            "name": "Neal W Morton"
+        }
+    ],
+    "keywords": [
+        "psychology",
+        "Python",
+        "modeling",
+    ],
+    "access_right": "open"
+}
