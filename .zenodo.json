@@ -1,19 +1,14 @@
 {
-    "language": "eng",
-    "license": "GPL-3.0+",
-    "title": "PsiReact: Modeling of response time data.",
+    "description": "<p>This version is for testing Zenodo upload.</p>",
+    "license": "other-open",
+    "title": "mortonne/psireact: PsiReact 0.2.3",
+    "version": "v0.2.3",
     "upload_type": "software",
     "creators": [
         {
-            "orcid": "0000-0002-2631-2710",
             "affiliation": "The University of Texas at Austin",
             "name": "Neal W Morton"
         }
     ],
-    "keywords": [
-        "psychology",
-        "Python",
-        "modeling",
-    ],
-    "access_right": "open"
+    "access_right": "open",
 }
