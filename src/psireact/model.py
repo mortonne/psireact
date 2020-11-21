@@ -50,12 +50,15 @@ def subj_bounds(var_bounds, group_vars, subj_vars, n_subj):
     group_lb = [var_bounds[k][0] for k in [*group_vars]]
     group_ub = [var_bounds[k][1] for k in [*group_vars]]
 
-    subj_lb = np.hstack([np.tile(var_bounds[k][0], n_subj)
-                         for k in [*subj_vars]])
-    subj_ub = np.hstack([np.tile(var_bounds[k][1], n_subj)
-                         for k in [*subj_vars]])
-    bounds = optim.Bounds(np.hstack((group_lb, subj_lb)),
-                          np.hstack((group_ub, subj_ub)))
+    subj_lb = np.hstack(
+        [np.tile(var_bounds[k][0], n_subj) for k in [*subj_vars]]
+    )
+    subj_ub = np.hstack(
+        [np.tile(var_bounds[k][1], n_subj) for k in [*subj_vars]]
+    )
+    bounds = optim.Bounds(
+        np.hstack((group_lb, subj_lb)), np.hstack((group_ub, subj_ub))
+    )
     return bounds
 
 
@@ -71,8 +74,9 @@ def unpack_subj(fixed, x, group_vars, subj_vars):
     if len(xs) % len(subj_vars) != 0:
         raise ValueError('Parameter vector has incorrect length.')
     n_subj = int(len(xs) / len(subj_vars))
-    split = [xs[(i * n_subj):(i * n_subj + n_subj)]
-             for i in range(len(subj_vars))]
+    split = [
+        xs[(i * n_subj):(i * n_subj + n_subj)] for i in range(len(subj_vars))
+    ]
 
     # construct subject-specific parameters
     subj_param = [dict(zip(subj_vars, pars)) for pars in zip(*split)]
@@ -100,8 +104,9 @@ def sample_params(fixed, param, subj_param, n_subj):
     """Create a random sample of parameters."""
     d_group = {name: f() for name, f in param.items()}
     d_subj = {name: f() for name, f in subj_param.items()}
-    gen_param_subj = [{name: val[i] for name, val in d_subj.items()}
-                      for i in range(n_subj)]
+    gen_param_subj = [
+        {name: val[i] for name, val in d_subj.items()} for i in range(n_subj)
+    ]
     gen_param = fixed.copy()
     gen_param.update(d_group)
     return gen_param, gen_param_subj
@@ -117,9 +122,10 @@ def post_param(trace, fixed, group_vars, subj_vars=None):
         m_subj = {name: np.mean(trace.get_values(name), 0)
                   for name in subj_vars}
         n_subj = len(m_subj[subj_vars[0]])
-        subj_param = [dict(zip(subj_vars,
-                               [m_subj[name][ind] for name in subj_vars]))
-                      for ind in range(n_subj)]
+        subj_param = [
+            dict(zip(subj_vars, [m_subj[name][ind] for name in subj_vars]))
+            for ind in range(n_subj)
+        ]
     else:
         subj_param = {}
     return param, subj_param
