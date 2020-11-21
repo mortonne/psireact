@@ -10,6 +10,7 @@ import theano.tensor as tt
 
 
 def log_prob(p):
+    """Calculate log probability."""
     # ensure that the probability is not zero before taking log
     eps = 10e-10
     logp = pm.math.log(pm.math.clip(p, eps, np.Inf))
@@ -17,7 +18,32 @@ def log_prob(p):
 
 
 def param_search(f_fit, data, bounds, nrep=1, verbose=False):
-    """Run a parameter search, with optional replication."""
+    """
+    Run a parameter search, with optional replication.
+
+    Parameters
+    ----------
+    f_fit : callable
+        Function that evaluates likelihood, given an input vector of
+        parameters values.
+
+    data : tuple
+        Additional input needed to evaluate the parameters.
+
+    bounds : sequence or scipy.optimize.Bounds
+        Bounds for the parameters.
+
+    nrep : int, optional
+        Number of times to repeat searches.
+
+    verbose : bool, optional
+        If true, print more information.
+
+    Returns
+    -------
+    res : scipy.optimize.OptimizeResult
+        Optimization results.
+    """
     f_optim = optim.differential_evolution
     if nrep > 1:
         val = np.zeros(nrep)
@@ -38,7 +64,22 @@ def param_search(f_fit, data, bounds, nrep=1, verbose=False):
 
 
 def param_bounds(var_bounds, var_names):
-    """Pack group-level parameters."""
+    """
+    Set boundaries of group-level parameters.
+
+    Parameters
+    ----------
+    var_bounds : dict of (str: tuple of float)
+        Lower and upper bounds of each parameter.
+
+    var_names : list of str
+        Names of parameters to include.
+
+    Returns
+    -------
+    bounds : scipy.optimize.Bounds
+        Bounds object for use with scipy optimization functions.
+    """
     group_lb = [var_bounds[k][0] for k in [*var_names]]
     group_ub = [var_bounds[k][1] for k in [*var_names]]
     bounds = optim.Bounds(group_lb, group_ub)
@@ -46,7 +87,28 @@ def param_bounds(var_bounds, var_names):
 
 
 def subj_bounds(var_bounds, group_vars, subj_vars, n_subj):
-    """Pack subject-varying parameters."""
+    """
+    Set boundaries of group and subject parameters.
+
+    Parameters
+    ----------
+    var_bounds : dict of (str: tuple of float)
+        Lower and upper bounds of each parameter.
+
+    group_vars : list of str
+        Names of parameters included as group parameters.
+
+    subj_vars : list of str
+        Names of parameters included as subject parameters.
+
+    n_subj : int
+        Number of subjects.
+
+    Returns
+    -------
+    bounds : scipy.optimize.Bounds
+        Bounds object for use with scipy optimization functions.
+    """
     group_lb = [var_bounds[k][0] for k in [*group_vars]]
     group_ub = [var_bounds[k][1] for k in [*group_vars]]
 
@@ -63,7 +125,31 @@ def subj_bounds(var_bounds, group_vars, subj_vars, n_subj):
 
 
 def unpack_subj(fixed, x, group_vars, subj_vars):
-    """Unpack subject-varying parameters."""
+    """
+    Unpack subject-varying parameters.
+
+    Parameters
+    ----------
+    fixed : dict of (str: float)
+        Parameters with fixed values.
+
+    x : numpy.ndarray
+        Parameter values.
+
+    group_vars : list of str
+        Names of group-level parameters.
+
+    subj_vars : list of str
+        Names of subject-level parameters.
+
+    Returns
+    -------
+    param : dict of (str: float)
+        Group-level parameters.
+
+    subj_param : list of (dict of (str: float))
+        Parameters for each subject.
+    """
     # unpack group parameters
     param = fixed.copy()
     param.update(dict(zip(group_vars, x)))
@@ -84,7 +170,19 @@ def unpack_subj(fixed, x, group_vars, subj_vars):
 
 
 def trace_df(trace):
-    """Create a data frame from a trace object."""
+    """
+    Create a data frame from a trace object.
+
+    Parameters
+    ----------
+    trace : pymc3.backends.base.MultiTrace
+        Results from sampling using pymc3.
+
+    Returns
+    -------
+    df : pandas.DataFrame
+        Trace samples, with one column for each variable.
+    """
     # exclude transformed variables
     var_names = [n for n in trace.varnames if not n.endswith('__')]
     d_var = {var: trace.get_values(var) for var in var_names}
@@ -93,7 +191,28 @@ def trace_df(trace):
 
 
 def sample_hier_drift(sd, alpha, beta, size=1):
-    """Sample a hierarchical drift parameter."""
+    """
+    Sample a hierarchical drift parameter.
+
+    Parameters
+    ----------
+    sd : float
+        Standard deviation of the group mu distribution.
+
+    alpha : float
+        Alpha parameter of the group standard deviation distribution.
+
+    beta : float
+        Beta parameter of the group standard deviation distribution.
+
+    size : int, optional
+        Number of values to sample.
+
+    Returns
+    -------
+    x : numpy.ndarray or scalar
+        Randomly sampled drift parameter for each simulated subject.
+    """
     group_mu = st.halfnorm.rvs(sd)
     group_sd = st.gamma.rvs(alpha, 1/beta)
     x = st.norm.rvs(group_mu, group_sd, size)
@@ -101,7 +220,31 @@ def sample_hier_drift(sd, alpha, beta, size=1):
 
 
 def sample_params(fixed, param, subj_param, n_subj):
-    """Create a random sample of parameters."""
+    """
+    Create a random sample of parameters.
+
+    Parameters
+    ----------
+    fixed : dict of (str: float)
+        Values of fixed parameters.
+
+    param : dict of (str: callable)
+        Callables to sample group-level parameter values.
+
+    subj_param : dict of (str: callable)
+        Callables to sample subjct-level parameter values.
+
+    n_subj : int
+        Number of subjects to randomly sample.
+
+    Returns
+    -------
+    gen_param : dict of (str: float)
+        Sampled group-level parameters.
+
+    gen_param_subj : list of (dict of (str: float))
+        Sampled subject-level parameters.
+    """
     d_group = {name: f() for name, f in param.items()}
     d_subj = {name: f() for name, f in subj_param.items()}
     gen_param_subj = [
@@ -113,7 +256,31 @@ def sample_params(fixed, param, subj_param, n_subj):
 
 
 def post_param(trace, fixed, group_vars, subj_vars=None):
-    """Create parameter set from mean of the posterior distribution."""
+    """
+    Create parameter set from mean of the posterior distribution.
+
+    Parameters
+    ----------
+    trace : pymc3.backends.base.MultiTrace
+        Results from sampling using pymc3.
+
+    fixed : dict of (str: float)
+        Values of fixed parameters.
+
+    group_vars : list of str
+        Names of group-level parameters.
+
+    subj_vars : list of str, optional
+        Names of subject-level parameters.
+
+    Returns
+    -------
+    param : dict of (str: float)
+        Group-level parameters.
+
+    subj_param : list of (dict of (str: float))
+        Parameters for each subject.
+    """
     param = fixed.copy()
     for name in group_vars:
         param[name] = np.mean(trace.get_values(name), 0)
@@ -140,21 +307,89 @@ class ReactModel:
 
     @abc.abstractmethod
     def tensor_pdf(self, rt, response, test, param):
-        """Probability density function for a set of parameters."""
+        """
+        Probability density function for a set of parameters.
+
+        Parameters
+        ----------
+        rt : numpy.ndarray
+            Response times on each trial.
+
+        response : numpy.ndarray
+            Response options selected on each trial.
+
+        test : numpy.ndarray
+            Type of each test trial.
+
+        param : dict of (str: float)
+            Parameter values.
+
+        Returns
+        -------
+        numpy.ndarray
+            Probability density function value for each trial.
+        """
         pass
 
     @abc.abstractmethod
     def function_pdf(self):
-        """Compiled Theano PDF."""
+        """
+        Compiled Theano probability density function.
+
+        Returns
+        -------
+        theano.compile.function_module.Function
+            Compiled function that takes data and parameters and
+            returns the PDF.
+        """
         pass
 
     @abc.abstractmethod
     def rvs_test(self, test_type, param, size):
-        """Generate responses for a given test type."""
+        """
+        Generate responses for a given test type.
+
+        Parameters
+        ----------
+        test_type : int
+            Test trial type.
+
+        param : dict of (str: float)
+            Parameter values.
+
+        size : int
+            Number of trials to simulate.
+
+        Returns
+        -------
+        rt : numpy.ndarray
+            Simulated response times.
+
+        response : numpy.ndarray
+            Simulated responses.
+        """
         pass
 
     def rvs(self, test, param):
-        """Generate responses for all test types."""
+        """
+        Generate responses for all test types.
+
+        Parameters
+        ----------
+        test : numpy.ndarray
+            Test trial type.
+
+        param : dict of (str: float)
+            Parameter values.
+
+        Returns
+        -------
+        rt : numpy.ndarray
+            Simulated response times.
+
+        response : numpy.ndarray
+            Simulated responses.
+        """
         n_trial = len(test)
         response = np.zeros(n_trial)
         rt = np.zeros(n_trial)
@@ -168,7 +403,31 @@ class ReactModel:
         return rt, response
 
     def rvs_subj(self, test, subj_idx, param, subj_param):
-        """Generate responses based on subject-varying parameters."""
+        """
+        Generate responses based on subject-varying parameters.
+
+        Parameters
+        ----------
+        test : numpy.ndarray
+            Test trial type.
+
+        subj_idx : numpy.ndarray
+            Index of the subject to simulate for each trial.
+
+        param : dict of (str: float)
+            Parameter values.
+
+        subj_param : list of (dict of (str: float))
+            Parameter values for each subject.
+
+        Returns
+        -------
+        rt : numpy.ndarray
+            Simulated response times.
+
+        response : numpy.ndarray
+            Simulated responses.
+        """
         unique_idx = np.unique(subj_idx)
         rt = np.zeros(test.shape)
         response = np.zeros(test.shape)
@@ -179,7 +438,31 @@ class ReactModel:
         return rt, response
 
     def gen(self, test, param, subj_idx=None, nrep=1, subj_param=None):
-        """Generate a simulated dataset."""
+        """
+        Generate a simulated dataset.
+
+        Parameters
+        ----------
+        test : numpy.ndarray
+            Test type of each trial.
+
+        param : dict of (str: float)
+            Parameter values.
+
+        subj_idx : numpy.ndarray, optional
+            Index of the subject to simulate for each trial.
+
+        nrep : int, optional
+            Number of replications to simulate.
+
+        subj_param : list of (dict of (str: float)), optional
+            Parameter values for each subject.
+
+        Returns
+        -------
+        data : pandas.DataFrame
+            Simulated data.
+        """
         data_list = []
         for i in range(nrep):
             if subj_param is not None:
@@ -196,14 +479,43 @@ class ReactModel:
         return data
 
     def tensor_logp(self, param):
-        """Function to evaluate the log PDF for a given response."""
+        """
+        Function to evaluate the log PDF for a given response.
+
+        Parameters
+        ----------
+        param : dict of (str: float)
+            Parameter values.
+
+        Returns
+        -------
+        logp : callable
+            Function that takes rt, response, and test and returns log
+            probability.
+        """
         def logp(rt, response, test):
             p = self.tensor_pdf(rt, response, test, param)
             return log_prob(p)
         return logp
 
     def tensor_logp_subj(self, param, subj_vars):
-        """Function to evaluate the log PDF with subject-varying parameters."""
+        """
+        Function to evaluate the log PDF with subject-varying parameters.
+
+        Parameters
+        ----------
+        param : dict of (str: float)
+            Parameter values.
+
+        subj_vars : list of str
+            Names of parameters that vary by subject.
+
+        Returns
+        -------
+        logp : callable
+            Function that takes rt, response, test, and subj_param and returns
+            log probability.
+        """
         def logp(rt, response, test, subj_idx):
             i = tt.cast(subj_idx, 'int64')
             subj_param = param.copy()
@@ -214,7 +526,32 @@ class ReactModel:
         return logp
 
     def total_logl(self, rt, response, test, param, f_l=None):
-        """Calculate log likelihood."""
+        """
+        Calculate log likelihood.
+
+        Parameters
+        ----------
+        rt : numpy.ndarray
+            Response times on each trial.
+
+        response : numpy.ndarray
+            Response options selected on each trial.
+
+        test : numpy.ndarray
+            Type of each test trial.
+
+        param : dict of (str: float)
+            Parameter values.
+
+        f_l : callable, optional
+            Function that takes rt, response, test, and param and
+            returns likelihood for each trial.
+
+        Returns
+        -------
+        logl : float
+            Log likelihood of all trials.
+        """
         if f_l is None:
             f_l = self.function_pdf()
         eps = 0.000001
@@ -228,7 +565,38 @@ class ReactModel:
 
     def total_logl_subj(self, rt, response, test, subj_idx, param, indiv_param,
                         f_l=None):
-        """Calculate log likelihood using subject-varying parameters."""
+        """
+        Calculate log likelihood using subject-varying parameters.
+
+        Parameters
+        ----------
+        rt : numpy.ndarray
+            Response times on each trial.
+
+        response : numpy.ndarray
+            Response options selected on each trial.
+
+        test : numpy.ndarray
+            Type of each test trial.
+
+        subj_idx : numpy.ndarray
+            Index of the subject to simulate for each trial.
+
+        param : dict of (str: float)
+            Parameter values.
+
+        indiv_param : list of (dict of (str: float))
+            Parameter values for each subject.
+
+        f_l : callable, optional
+            Function that takes rt, response, test, and param and
+            returns likelihood for each trial.
+
+        Returns
+        -------
+        logl : float
+            Log likelihood of all trials.
+        """
         if f_l is None:
             f_l = self.function_pdf()
 
@@ -245,7 +613,23 @@ class ReactModel:
         return logl
 
     def function_logl(self, fixed, var_names):
-        """Generate log likelihood function for use with fitting."""
+        """
+        Generate log likelihood function for use with fitting.
+
+        Parameters
+        ----------
+        fixed : dict of (str: float)
+            Values of fixed parameters.
+
+        var_names : list of str
+            Names of variable parameters.
+
+        Returns
+        -------
+        fit_logl : callable
+            Function that takes parameters, rt, response, and test and
+            returns log likelihood.
+        """
         param = fixed.copy()
         f_l = self.function_pdf()
 
@@ -258,7 +642,26 @@ class ReactModel:
         return fit_logl
 
     def function_logl_subj(self, fixed, group_vars, subj_vars):
-        """Generate log likelihood function for subject fitting."""
+        """
+        Generate log likelihood function for subject fitting.
+
+        Parameters
+        ----------
+        fixed : dict of (str: float)
+            Values of fixed parameters.
+
+        group_vars : list of str
+            Names of variable group parameters.
+
+        subj_vars : list of str
+            Names of variable subject parameters.
+
+        Returns
+        -------
+        fit_logl_subj : callable
+            Function that takes parameters, rt, response, test, and
+            subject index, and returns log likelihood.
+        """
         f_l = self.function_pdf()
 
         def fit_logl_subj(x, rt, response, test, subj_idx):
@@ -274,7 +677,42 @@ class ReactModel:
 
     def fit(self, rt, response, test, fixed, var_names, var_bounds,
             nrep=1, verbose=False):
-        """Estimate maximum likelihood parameters."""
+        """
+        Estimate maximum likelihood parameters.
+
+        rt : numpy.ndarray
+            Response times on each trial.
+
+        response : numpy.ndarray
+            Response options selected on each trial.
+
+        test : numpy.ndarray
+            Type of each test trial.
+
+        fixed : dict of (str: float)
+            Values of fixed parameters.
+
+        var_names : list of str
+            Names of variable parameters.
+
+        var_bounds : dict of (str: tuple of float)
+            Lower and upper bounds of each parameter.
+
+        nrep : int, optional
+            Number of times to repeat searches.
+
+        verbose : bool, optional
+            If true, print more information.
+
+        Returns
+        -------
+        param : dict of (str: float)
+            Maximum likelihood parameter values.
+
+        stats : dict
+            Log likelihood, number of parameters, number of datapoints
+            fit, and Bayesian information criterion.
+        """
         # maximum likelihood estimation
         fit_logl = self.function_logl(fixed, var_names)
         bounds = param_bounds(var_bounds, var_names)
@@ -297,7 +735,50 @@ class ReactModel:
     def fit_subj(self, rt, response, test, subj_idx,
                  fixed, group_vars, subj_vars, var_bounds,
                  nrep=1, verbose=False):
-        """Estimate maximum likelihood parameters for each subject."""
+        """
+        Estimate maximum likelihood parameters for each subject.
+
+        Parameters
+        ----------
+        rt : numpy.ndarray
+            Response times on each trial.
+
+        response : numpy.ndarray
+            Response options selected on each trial.
+
+        test : numpy.ndarray
+            Type of each test trial.
+
+        subj_idx : numpy.ndarray
+            Index of the subject to simulate for each trial.
+
+        fixed : dict of (str: float)
+            Values of fixed parameters.
+
+        group_vars : list of str
+            Names of group-level variable parameters.
+
+        subj_vars : list of str
+            Names of subject-level variable parameters.
+
+        var_bounds : dict of (str: tuple of float)
+            Lower and upper bounds of each parameter.
+
+        nrep : int, optional
+            Number of times to repeat searches.
+
+        verbose : bool, optional
+            If true, print more information.
+
+        Returns
+        -------
+        param : list of (dict of (str: float))
+            Maximum likelihood parameter values for each subject.
+
+        stats : dict
+            Log likelihood, number of parameters, number of datapoints
+            fit, and Bayesian information criterion.
+        """
         # maximum likelihood estimation
         fit_logl = self.function_logl_subj(fixed, group_vars, subj_vars)
 
