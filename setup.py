@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="psireact",
-    version="0.2.11",
+    version="0.2.12",
     author="Neal Morton",
     author_email="mortonne@gmail.com",
     description="Response time modeling of psychology experiments",
