@@ -3,10 +3,7 @@
     "license": {
         "id": "other-open"
     },
-    "resource_type": {
-        "type": "software",
-        "title": "Software"
-    },
+    "upload_type": "software",
     "creators": [
         {
             "affiliation": "The University of Texas at Austin",
