@@ -1,8 +1,6 @@
 {
     "license": {
         "id": "GPL-3.0",
-        "url": "https://api.github.com/licenses/gpl-3.0",
-        "title": "GNU General Public License v3.0",
     },
     "upload_type": "software",
     "creators": [
