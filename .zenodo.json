@@ -1,12 +1,12 @@
 {
     "license": {
-        "id": "other-open",
+        "id": "other-open"
     },
     "upload_type": "software",
     "creators": [
         {
             "name": "Neal W Morton",
-            "affiliation": "The University of Texas at Austin",
+            "affiliation": "The University of Texas at Austin"
         }
     ],
     "access_right": "open"
