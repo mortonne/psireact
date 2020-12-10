@@ -63,5 +63,12 @@ Directions for future development:
 
 If you use PsiReact, please cite the following:
 
- * Morton NW, Schlichting ML, Preston AR. In press. Representations of common event structure in medial temporal lobe and frontoparietal cortex support efficient inference.
- * Morton NW. 2020. PsiReact: Modeling of response time data. Zenodo. http://doi.org/10.5281/zenodo.4282758
+ * Morton NW, Schlichting ML, Preston AR. 2020. 
+   Representations of common event structure in medial temporal lobe and frontoparietal cortex support efficient inference. 
+   Proceedings of the National Academy of Sciences. 
+   117(47): 29338-29345.
+   [doi:10.1073/pnas.1912338117](https://doi.org/10.1073/pnas.1912338117).
+ * Morton NW. 2020. 
+   PsiReact: Modeling of response time data. 
+   Zenodo.
+   [doi:10.5281/zenodo.4282758](https://doi.org/10.5281/zenodo.4282758).
