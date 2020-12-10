@@ -1,6 +1,6 @@
 # PsiReact
 [![PyPI version](https://badge.fury.io/py/psireact.svg)](https://badge.fury.io/py/psireact)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4282758.svg)](https://doi.org/10.5281/zenodo.4282758)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4282757.svg)](https://doi.org/10.5281/zenodo.4282757)
 
 Hierarchical Bayesian modeling of response time data.
 
@@ -71,4 +71,4 @@ If you use PsiReact, please cite the following:
  * Morton NW. 2020. 
    PsiReact: Modeling of response time data. 
    Zenodo.
-   [doi:10.5281/zenodo.4282758](https://doi.org/10.5281/zenodo.4282758).
+   [doi:10.5281/zenodo.4282757](https://doi.org/10.5281/zenodo.4282757).
