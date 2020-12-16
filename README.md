@@ -51,6 +51,7 @@ pip install git+git://github.com/mortonne/psireact
 To get an intuition for what sort of behavior the LBA model can produce, look at the [LBA demo notebook](https://github.com/mortonne/psireact/blob/master/jupyter/lba_demo.ipynb). 
 The LBA model can be used to both generate simulated data and to estimate parameters based on observed data. 
 See the [LBA parameter recovery](https://github.com/mortonne/psireact/blob/master/jupyter/lba_recovery.ipynb) notebook for examples.
+Also see examples of more complex hierachical models in the [Nireact](https://github.com/mortonne/nireact) project.
 
 ## Road map
 
