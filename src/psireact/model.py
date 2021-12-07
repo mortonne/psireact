@@ -5,8 +5,8 @@ import numpy as np
 import scipy.stats as st
 import scipy.optimize as optim
 import pandas as pd
-import pymc3 as pm
-import theano.tensor as tt
+import pymc as pm
+import aesara.tensor as aet
 
 
 def log_prob(p):
@@ -517,7 +517,7 @@ class ReactModel:
             log probability.
         """
         def logp(rt, response, test, subj_idx):
-            i = tt.cast(subj_idx, 'int64')
+            i = aet.cast(subj_idx, 'int64')
             subj_param = param.copy()
             for var in subj_vars:
                 subj_param[var] = param[var][i]

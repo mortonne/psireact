@@ -3,9 +3,9 @@
 import math
 import numpy as np
 import scipy.stats as st
-import theano
-import theano.tensor as tt
-import pymc3 as pm
+import aesara
+import aesara.tensor as aet
+import pymc as pm
 from psireact import model
 
 
@@ -78,50 +78,50 @@ def tcdf(t, A, b, v, s):
 
 def ncdf(t, A, b, v, s):
     """Probability of no response from a set of accumulators."""
-    ncdf_all, updates = theano.reduce(
+    ncdf_all, updates = aesara.reduce(
         fn=lambda v_i, tot, t, A, b, s: (1 - tcdf(t, A, b, v_i, s)) * tot,
-        sequences=v, outputs_info=tt.ones_like(t),
+        sequences=v, outputs_info=aet.ones_like(t),
         non_sequences=[t, A, b, s])
     return ncdf_all
 
 
 def resp_pdf(t, ind, A, b, v, s):
     """Probability density function for response i at time t."""
-    p_neg, updates = theano.reduce(
+    p_neg, updates = aesara.reduce(
         fn=lambda v_i, tot, s: normcdf(-v_i / s) * tot,
-        sequences=v, outputs_info=tt.ones(1, dtype='float64'), non_sequences=s)
+        sequences=v, outputs_info=aet.ones(1, dtype='float64'), non_sequences=s)
 
     # PDF for i and no finish yet for others
-    v_ind = tt.arange(v.shape[0])
-    i = tt.cast(ind, 'int64')
-    res, updates = theano.scan(
+    v_ind = aet.arange(v.shape[0])
+    i = aet.cast(ind, 'int64')
+    res, updates = aesara.scan(
         fn=(lambda t_j, i_j, v_ind, A, b, v, s:
             (tpdf(t_j, A, b, v[i_j], s) *
-             ncdf(t_j, A, b, v[tt.nonzero(tt.neq(v_ind, i_j))], s))),
+             ncdf(t_j, A, b, v[aet.nonzero(aet.neq(v_ind, i_j))], s))),
         sequences=[t, i], non_sequences=[v_ind, A, b, v, s])
 
     # conditionalize on any response
     pdf = res / (1 - p_neg)
 
     # define probability of negative times to zero
-    pdf_cond = tt.switch(tt.gt(t, 0), pdf, 0)
+    pdf_cond = aet.switch(aet.gt(t, 0), pdf, 0)
     return pdf_cond
 
 
 def trial_resp_pdf(t, ind, A, b, v, s):
     """Probability density function for response i at time t."""
-    p_neg, updates = theano.reduce(
+    p_neg, updates = aesara.reduce(
         fn=lambda v_i, tot, s: normcdf(-v_i / s) * tot,
-        sequences=v, outputs_info=tt.ones(1, dtype='float64'), non_sequences=s)
+        sequences=v, outputs_info=aet.ones(1, dtype='float64'), non_sequences=s)
 
     # PDF for i and no finish yet for others
-    v_ind = tt.arange(v.shape[0])
-    i = tt.cast(ind, 'int64')
+    v_ind = aet.arange(v.shape[0])
+    i = aet.cast(ind, 'int64')
     pdf = (tpdf(t, A, b, v[i], s) *
-           ncdf(t, A, b, v[tt.nonzero(tt.neq(v_ind, i))], s)) / (1 - p_neg)
+           ncdf(t, A, b, v[aet.nonzero(aet.neq(v_ind, i))], s)) / (1 - p_neg)
 
     # define probability of negative times to zero
-    pdf_cond = tt.switch(tt.gt(t, 0), pdf, 0)
+    pdf_cond = aet.switch(aet.gt(t, 0), pdf, 0)
     return pdf_cond
 
 
@@ -135,17 +135,17 @@ class LBA(model.ReactModel):
 
     def function_pdf(self):
         # time and response vary by trial
-        t = tt.dvector('t')
-        i = tt.ivector('i')
+        t = aet.dvector('t')
+        i = aet.ivector('i')
 
         # parameters are fixed over trial
-        A = tt.dscalar('A')
-        b = tt.dscalar('b')
-        v = tt.dvector('v')
-        s = tt.dscalar('s')
-        tau = tt.dscalar('tau')
+        A = aet.dscalar('A')
+        b = aet.dscalar('b')
+        v = aet.dvector('v')
+        s = aet.dscalar('s')
+        tau = aet.dscalar('tau')
         pdf = resp_pdf(t - tau, i, A, b, v, s)
-        f = theano.function([t, i, A, b, v, s, tau], pdf)
+        f = aesara.function([t, i, A, b, v, s, tau], pdf)
         return f
 
     def rvs_test(self, test, param, size):
